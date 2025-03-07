@@ -1,0 +1,15 @@
+select 
+aareadesc as [Client],
+ldesc as [License/Subscription Name],
+isnull(idihid,0) as [Invoice Number],
+iditem_shortdescription as [Invoice Line Description],
+LBillingCycle as [Billing Cycle],
+LNotes as [Notes],
+case when ltype=0 then 'Software Licence' when ltype=1 then 'Subscription' else 'Other' end [Type]
+from Licence
+
+join area on aarea=larea
+left join InvoiceDetailQuantity on IDQLicenceId=lid
+left join invoicedetail on idid=idqidid
+
+where lcount>0 and (lstatus='active' OR lstatus IS NULL) and ldeleted=0 and lisactive=1 and isnull(idihid,0) = 0
