@@ -1,0 +1,11 @@
+SELECT
+  area.aareadesc AS [Client],
+  COUNT(faults.faultid) AS [Ticket Count]
+FROM faults
+JOIN area ON faults.areaint = area.aarea
+JOIN requesttype ON requesttype.rtid = faults.requesttypenew 
+WHERE faults.fdeleted = 0 
+  AND requesttype.rtisproject = 0 
+  AND requesttype.rtisopportunity = 0 
+  AND faults.status <> 9
+GROUP BY area.aareadesc
