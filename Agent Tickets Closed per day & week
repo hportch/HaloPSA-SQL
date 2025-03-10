@@ -1,0 +1,26 @@
+SELECT
+    uname as [Agent],
+    (SELECT
+        COUNT(*) 
+    FROM faults 
+    join requesttype on requesttype.rtid = faults.RequestTypeNew
+    WHERE clearwhoint = unum 
+        AND CAST(DateCleared AS DATE) = CAST(GETDATE() AS DATE) /* Only tickets closed today */
+        AND fmergedintofaultid = 0 
+        AND fdeleted = 0
+        AND RTIsOpportunity	= 0
+        AND RTIsProject = 0
+    ) AS [Closed Tickets Today],
+    (SELECT
+        count(*) 
+    FROM faults
+    join requesttype on requesttype.rtid = faults.RequestTypeNew
+    WHERE clearwhoint = unum 
+        AND DateCleared >= DATEADD(DAY, -DATEPART(WEEKDAY, GETDATE()) + 1, CAST(GETDATE() AS DATE)) 
+        AND DateCleared < DATEADD(DAY, 7 - DATEPART(WEEKDAY, GETDATE()) + 1, CAST(GETDATE() AS DATE))
+        and fmergedintofaultid = 0 
+        and fdeleted = 0
+        AND RTIsOpportunity	= 0
+        AND RTIsProject = 0
+    ) as [Closed Tickets This Week]
+FROM uname
