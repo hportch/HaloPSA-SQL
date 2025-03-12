@@ -1,0 +1,13 @@
+SELECT 
+    gdesc as Product_Group,
+    ROUND(SUM(QD.QDQuantity * QD.QDPrice), 2) AS Total_Revenue,
+    ROUND(SUM(QD.QDQuantity * QD.QDCostPrice), 2) AS Total_Cost,
+    ROUND(SUM((QD.QDQuantity * QD.QDPrice) - (QD.QDQuantity * QD.QDCostPrice)), 2) AS Total_Margin
+FROM QUOTATIONHEADER QH
+JOIN QUOTATIONDETAIL QD ON QH.qhid = QD.QDQHid
+LEFT JOIN item I ON QD.QDItemid = I.iid
+JOIN generic G on I.igeneric = G.ggeneric
+WHERE QH.QHstatus = 1 /* Quotes marked as Accepted */
+  AND QH.QHApprovalDateTime BETWEEN @StartDate AND @EndDate
+GROUP BY 
+    gdesc
