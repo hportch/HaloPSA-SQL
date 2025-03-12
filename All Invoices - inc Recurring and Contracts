@@ -1,0 +1,22 @@
+SELECT 
+    A.AAreaDesc AS Client_Name,
+    IH.ihid AS Invoice_Number,
+    IH.IHInvoice_Date AS Invoice_Date,
+    ROUND(SUM(ID.IDNet_Amount), 2) AS Total_Revenue,
+    ROUND(SUM(ID.IDNet_Amount - (ID.IDUnit_Cost * ID.IDQty_Order)), 2) AS Invoice_Margin,
+    CASE 
+        WHEN IH.IHrecurringInvoiceId <> 0 THEN 'Yes' 
+        ELSE 'No' 
+    END AS Is_Recurring,
+    CH.CHContractRef AS Contract_Reference
+FROM InvoiceHeader IH
+JOIN InvoiceDetail ID ON IH.ihid = ID.IdIHid
+JOIN Area A ON IH.IHaarea = A.AArea
+LEFT JOIN ContractHeader CH ON IH.IHCHID = CH.CHID
+WHERE IH.IHInvoice_Date BETWEEN @StartDate AND @EndDate
+GROUP BY 
+    A.AAreaDesc, 
+    IH.ihid, 
+    IH.IHInvoice_Date, 
+    CH.CHContractRef,
+    IH.IHrecurringInvoiceId
