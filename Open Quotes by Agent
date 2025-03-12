@@ -1,0 +1,13 @@
+SELECT 
+    U.uname as Agent,
+    FORMAT(SUM(QD.QDQuantity * QD.QDPrice), 'c','en-UK') AS Total_Revenue,
+    FORMAT(SUM(QD.QDQuantity * QD.QDCostPrice), 'c','en-UK') AS Total_Cost,
+    FORMAT(SUM((QD.QDQuantity * QD.QDPrice) - (QD.QDQuantity * QD.QDCostPrice)), 'c','en-UK') AS Total_Margin
+FROM QUOTATIONHEADER QH
+JOIN QUOTATIONDETAIL QD ON QH.qhid = QD.QDQHid
+LEFT JOIN item I ON QD.QDItemid = I.iid
+LEFT JOIN uname U on QH.QHUnum = u.unum
+WHERE QH.QHstatus = 2
+  OR QH.QHSTATUS = 3 /* Quotes marked as Draft or Sent */
+GROUP BY 
+    u.uname
